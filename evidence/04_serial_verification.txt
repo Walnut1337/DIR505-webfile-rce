@@ -1,0 +1,6 @@
+echo ==PROOF==; cat /tmp/webfile_proof; echo ==PS==; ps | grep 'telnetd -p 2 338' | grep -v grep
+==PROOF==
+WEBFILE_CGI_RCE_20261014
+==PS==
+21158 root        572 S   /usr/sbin/telnetd -p 2338 -l /bin/sh 
+/ # 

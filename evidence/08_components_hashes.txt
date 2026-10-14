@@ -1,0 +1,26 @@
+# DIR-505 1.10B02 components and configuration
+# firmware: /home/walnut/Desktop/vuld/DIR505/DIR-505_A1_FW110B02.bin
+cd13a30e3f971c23eace3ae94380f28b  DIR-505_A1_FW110B02.bin
+
+# webfile_cgi.cgi:
+28cb86cc8b93ba2e4a47c6261403b5ce  usr/bin/webfile_cgi.cgi
+-rwxr-xr-x 1 root root 64872 Nov 28 2014 usr/bin/webfile_cgi.cgi
+
+# lighttpd-ws configuration (key lines):
+var.server_root = "/www/webfile_access/"
+server.port = 8181
+
+# NVRAM default:
+remote_web_port=8181
+
+# CGI routing (conf.d/cgi-ws.conf):
+alias.url += ( "/dws/api/AddDir"        => server_root + "webfile_cgi.cgi",
+               "/dws/api/DelFile"       => server_root + "webfile_cgi.cgi",
+               "/dws/api/ListDir"       => server_root + "webfile_cgi.cgi",
+               "/dws/api/ListFile"      => server_root + "webfile_cgi.cgi",
+               "/dws/api/ListRoot"      => server_root + "webfile_cgi.cgi",
+               "/dws/api/CopyFiles"     => server_root + "webfile_cgi.cgi",
+               "/dws/api/UploadFile"    => server_root + "webfile_cgi.cgi",
+               "/dws/api/ListCategory"  => server_root + "webfile_cgi.cgi",
+               "/dws/api/Login"         => server_root + "webfile_cgi.cgi",
+               "/dws/api/GetDirectServer" => server_root + "webfile_cgi.cgi" )

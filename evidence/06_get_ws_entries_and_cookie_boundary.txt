@@ -1,0 +1,26 @@
+# GET query-string and Cookie boundary tests
+# Target: emulated DIR-505 1.10B02 (FirmAE), SharePort on 8181
+
+## Baseline: GET /dws/api/ListRoot?a=1 (short Cookie)
+curl -s "http://<target>:8181/dws/api/ListRoot?a=1"
+{"status": "fail", "errno": 5003}
+
+## get_ws_entries QUERY_STRING overflow (len=1080): CGI crash -> empty response
+## (baseline with a valid query returns the errno 5003 JSON; the empty response is the crash signature)
+HTTP 200, size 0
+
+## get_ws_entries QUERY_STRING overflow (len=2500): CGI crash -> empty response
+HTTP 200, size 0
+
+## check_4session_uid Cookie overflow, boundary 1: cookie=10500 (does not reach $ra) -> normal errno 5003
+{"status": "fail", "errno": 5003}
+
+## Cookie overflow, boundary 2: cookie=10600 (>10588, overwrites $ra) -> CGI crash -> empty response
+HTTP 200, size 0
+
+# Notes:
+# - get_ws_entries() copies QUERY_STRING with strcpy() into a 1024-byte buffer and later
+#   decodes values into a second 1024-byte buffer; both are reachable before any session check.
+# - check_4session_uid() copies the "Cookie" environment variable with strcpy() into a small
+#   stack area; offset from cookie start to the saved $ra is 0x295C = 10588 bytes, hence the
+#   10500 (safe) vs 10600 (crash) boundary above.

